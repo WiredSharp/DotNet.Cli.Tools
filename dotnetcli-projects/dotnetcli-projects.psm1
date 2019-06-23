@@ -70,27 +70,32 @@ function New-ConsoleProject
     dotnet sln add ".\${sourceFolder}\${name}\${name}.csproj"
 }
 
-function Apply-Template([System.IO.FileInfo] $template) {
-    $targetPath = $template.Name -replace ".tpl.ps1", ""
-    $folder = (Split-Path (Split-Path $template.FullName) -Leaf)
-    if (!($folder -eq (Split-Path $PSScriptRoot -Leaf))){
-        $targetPath = Join-Path $folder $targetPath
+function Apply-Template([string] $template) {
+    $targetPath = $template -replace ".tpl.ps1", ""
+    if (Test-Path $targetPath) {
+        Write-Information "$targetPath already exists, skipping"
+        return
+    }
+    Write-Information "generating $targetPath"
+    if (!((Split-Path $targetPath) -eq "")) {
+        $folder = (Split-Path (Split-Path $targetPath) -Leaf)
         if (!(Test-Path $folder)) {
             Write-Debug "$folder does not exists, create it"
             New-Item -Path $folder -ItemType Directory > $null
         }
     }
-    if (Test-Path $targetPath) {
-        Write-Information "$targetPath already exists, skipping"
-    } 
-    else {
-        Write-Information "generating $template"
-        . "$($template.FullName)" > $targetPath
-    }
+    . "$($template.FullName)" > $targetPath
 }
 
 function Apply-Templates([System.IO.DirectoryInfo] $sourceFolder) {
+    Write-Information "applying templates from folder ${sourceFolder}..."
     foreach ($template in Get-ChildItem -Path $sourceFolder.FullName -Filter "*.tpl.ps1") {
-        Apply-Template $template
+        Apply-Template $template.Name
+    }
+    foreach ($subFolder in Get-ChildItem -Path $sourceFolder.FullName -Directory) {
+        Write-Information "applying templates from folder ${sourceFolder}\${subFolder}..."
+        foreach ($template in Get-ChildItem -Path $subFolder.FullName -Filter "*.tpl.ps1") {
+            Apply-Template (Join-Path $subFolder.Name $template.Name)
+        }    
     }
 }

@@ -1,3 +1,5 @@
+#Requires -Modules dotnetcli-projects
+
 [CmdletBinding(SupportsShouldProcess)]
 Param(
     # indicate the root namespace for projects
@@ -8,9 +10,11 @@ Param(
     ,[Parameter(HelpMessage="test project references")] [string[]] $TestPackages = @()
 )
 
-Set-StrictMode -Version Latest
+if (!$RootNamespace) {
+    $RootNamespace = [System.IO.Path]::GetFileName((Get-Location).Path)
+}
 
-Import-Module "${PSScriptRoot}\initialize.psm1"
+Set-StrictMode -Version Latest
 
 Create-Projects
 
@@ -30,9 +34,9 @@ if (!(Test-Path "Company")) {
     $Company = "EBL Inc."
 }
 
-foreach ($outputFolder in Get-ChildItem -Recurse -Path ".\" -Filter "$ArtifactFolder") {
-    Remove-Item -Recurse -Path $outputFolder -Force
-}
+# foreach ($outputFolder in Get-ChildItem -Recurse -Path ".\" -Filter "$ArtifactFolder") {
+#     Remove-Item -Recurse -Path $outputFolder -Force
+# }
 
 Apply-Templates $PSScriptRoot
 foreach ($folder in Get-ChildItem -Path $PSScriptRoot -Directory) {
