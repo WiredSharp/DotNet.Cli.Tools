@@ -13,4 +13,4 @@ $targetFolder = Join-Path -Path $moduleFolder -ChildPath $ModuleName
 
 Write-Verbose "publishing module $ModuleName to $targetFolder..."
 
-Copy-Item -Recurse -Path ".\${ModuleName}" -Destination $moduleFolder -Force
+Copy-Item -Recurse -Path ".\${ModuleName}" -Destination $targetFolder -Force
