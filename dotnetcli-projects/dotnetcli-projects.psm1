@@ -124,3 +124,4 @@ function New-Solution
     git add .\test > $null
     git add .\ > $null
 }
+
