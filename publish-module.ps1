@@ -15,7 +15,7 @@ Set-StrictMode -Version Latest
 ##############################
 # functions
 ##############################
-$_manifestVersionPattern = "ModuleVersion\s*=\s*('|"")(?<version>(?<major>[0-9]+)\.(?<minor>[0-9]+)\.(?<patch>[0-9]+))('|"")"
+$_manifestVersionPattern = "ModuleVersion\s*=\s*('|""|)(?<version>(?<major>[0-9]+)\.(?<minor>[0-9]+)\.(?<patch>[0-9]+))('|""|)"
 
 function update-ManifestVersion {
    Param(
@@ -25,7 +25,7 @@ function update-ManifestVersion {
       [Parameter()][string]$ManifestContent
    )
    #ModuleVersion = '1.2.0'
-   return $manifestContent -replace $_manifestVersionPattern, "ModuleVersion = $NewVersion"
+   return $manifestContent -replace $_manifestVersionPattern, "ModuleVersion = '$NewVersion'"
 }
 
 function get-ManifestVersion {
@@ -109,9 +109,11 @@ else {
 
 Write-Verbose "updating manifest version ${previousVersion} to ${Version}..."
 
-Set-Content $manifestPath (update-ManifestVersion $Version $manifestContent)
+Set-Content $manifestPath (update-ManifestVersion $Version $manifestContent) -Encoding utf8
 
 Write-Verbose "publishing module $ModuleName to $targetFolder..."
 
+Remove-ITem -Force -Recurse $targetFolder
 Copy-Item -Recurse -Path ".\${ModuleName}" -Destination $targetFolder -Force
 
+Write-Information "module $ModuleName v$Version published"

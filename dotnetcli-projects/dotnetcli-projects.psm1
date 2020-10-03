@@ -111,7 +111,7 @@ function New-Solution
         $Company = "EBL Inc."
     }
 
-    dotnet new zericcosol --Author $Author --ArtifactFolder $ArtifactFolder --IntermediateFolder $IntermediateFolder --Company $Company
+    dotnet new wiredsol --Author $Author --ArtifactFolder $ArtifactFolder --IntermediateFolder $IntermediateFolder --Company $Company
 
     # create solution
     dotnet new sln
